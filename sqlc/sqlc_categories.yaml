@@ -1,0 +1,52 @@
+version: 2
+
+sql:
+  # schema permissions
+  - schema:
+      - '../infra/databases/migrations/'
+    queries:
+      - '../app/queries/categories/'
+    engine: 'postgresql'
+    gen:
+      go:
+        package: 'categorydb'
+        out: '../pkg/db/categories'
+        sql_package: 'pgx/v5'
+        emit_db_tags: true
+        emit_prepared_queries: false
+        emit_interface: false
+        emit_exact_table_names: false
+        emit_enum_valid_method: true
+        query_parameter_limit: 3
+        output_db_file_name: 'db.go'
+        output_models_file_name: 'models.go'
+        output_querier_file_name: 'querier.go'
+        json_tags_case_style: 'camel'
+        overrides:
+          - db_type: 'timestamptz'
+            go_type: 'time.Time'
+
+          - db_type: 'timestamptz'
+            nullable: true
+            go_type: 'time.Time'
+
+          - db_type: 'varchar'
+            nullable: true
+            go_type: 'string'
+
+          - db_type: 'varchar'
+            go_type: 'string'
+
+          - db_type: 'text'
+            nullable: true
+            go_type: 'string'
+
+          - db_type: 'bool'
+            go_type: 'bool'
+
+          - db_type: 'uuid'
+            go_type: 'github.com/google/uuid.UUID'
+        rename:
+          from: 'id'
+          to: 'ID'
+          exact: true

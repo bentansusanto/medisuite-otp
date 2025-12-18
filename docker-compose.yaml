@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  medisuite-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: medisuite-api
+    command: ['air', '-c', '.air.toml']
+    restart: unless-stopped
+    env_file:
+      - .env.development
+    ports:
+      - '8081:8081'
+    environment:
+      - GO_ENV=development
+      - DB_PORT=5432
+      - DB_HOST=medisuite_postgres
+      - DB_NAME=medisuite_db
+      - DB_USER=medisuite_db
+      - DB_PASS=medisuite_dev_password
+      - DB_SSLMODE=disable
+      - DB_TIMEZONE=Asia/Jakarta
+      - MIGRATION_PATH=infra/databases/migrations
+      - MIGRATE_ENABLED=true
+      - JWT_SECRET=medisuite_jwt_secret
+    volumes:
+      - .:/app
+    depends_on:
+      - medisuite_postgres
+    networks:
+      - medisuite_network
+
+  medisuite_postgres:
+    image: postgres:15-alpine
+    container_name: medisuite_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: medisuite_db
+      POSTGRES_PASSWORD: medisuite_dev_password
+      POSTGRES_DB: medisuite_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - medisuite_network
+
+networks:
+  medisuite_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
