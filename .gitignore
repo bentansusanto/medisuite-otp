@@ -3,4 +3,4 @@ docker-compose.yml
 Dockerfile.dev
 go.mod
 Makefile
-infra/databases/migrations
+/infra/databases/migrations
