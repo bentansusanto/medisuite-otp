@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
 	"strings"
 	"time"
 
@@ -90,7 +89,7 @@ func (s *UserService) CreateUser(ctx context.Context, req userDTO.RegisterDTO) (
 		ownerExists := false
 		for _, user := range users {
 			// You need to check if user has OWNER role
-			// Since FindAllUsers returns role_code, we can check 
+			// Since FindAllUsers returns role_code, we can check
 			userWithRole, err := s.r.UserRepo().FindUserById(ctx, user.ID)
 			if err == nil && userWithRole != nil && userWithRole.RoleCode == roles.OWNER {
 				ownerExists = true
@@ -132,11 +131,8 @@ func (s *UserService) CreateUser(ctx context.Context, req userDTO.RegisterDTO) (
 	}
 
 	// send email verification
-	site := os.Getenv("CLIENT_SITE")
-	if role.Code == roles.OWNER {
-		site = os.Getenv("ADMIN_SITE")
-	}
-	verificationLink := fmt.Sprintf(site+"/api/v1/auth/verify-account?verify_token=%s", verifyCode)
+	site := "http://localhost:3002"
+	verificationLink := fmt.Sprintf(site+"/verify-account?verify_token=%s", verifyCode)
 	emailBody := fmt.Sprintf("Thank you for registering with Bizpos. Please verify your account by clicking the link below:\n\n%s\n\nThis link will expire in 24 hours.", verificationLink)
 
 	// send email (async or in background goroutine to not block response)
@@ -319,11 +315,8 @@ func (s *UserService) ResendVerifyAccount(ctx context.Context, email string) err
 	slog.Debug(success.SuccessResendVerifyAccount)
 
 	// send email verification and email body
-	site := os.Getenv("CLIENT_SITE")
-	if findUser.RoleCode == roles.OWNER {
-		site = os.Getenv("ADMIN_SITE")
-	}
-	verificationLink := fmt.Sprintf(site+"/api/v1/auth/verify-account?verify_token=%s", verifyToken)
+site := "http://localhost:3002"
+	verificationLink := fmt.Sprintf(site+"/verify-account?verify_token=%s", verifyToken)
 	emailBody := fmt.Sprintf("Thank you for registering with Bizpos. Please verify your account by clicking the link below:\n\n%s\n\nThis link will expire in 24 hours.", verificationLink)
 
 	// create send email
@@ -614,11 +607,8 @@ func (s *UserService) ForgotPassword(ctx context.Context, req *userDTO.EmailRequ
 	}
 
 	// Send forgot password email
-	site := os.Getenv("CLIENT_SITE")
-	if findUser.RoleName == roles.OWNER {
-		site = os.Getenv("ADMIN_SITE")
-	}
-	verificationLink := fmt.Sprintf(site+"/api/v1/auth/reset-password?verify_token=%s", forgotToken)
+	site := "http://localhost:3002"
+	verificationLink := fmt.Sprintf(site+"/reset-password?verify_token=%s", forgotToken)
 	emailBody := fmt.Sprintf("You have requested to reset your password. Please click the link below to reset your password:\n\n%s\n\nThis link will expire in 24 hours.", verificationLink)
 
 	// Send email

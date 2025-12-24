@@ -27,7 +27,7 @@ func NewCategoryRoute(handler handler.IHandler, group *gin.RouterGroup, repo rep
 }
 
 func (r *CategoryRoute) Run() {
-	groups := r.g.Group("api/v1/categories")
+	groups := r.g.Group("categories")
 	{
 		// routes
 		groups.GET("/find_all", r.h.CategoryHandler().FindAllCategory)
